@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { ART, StyleSheet, Text, View, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 // import Spinner from 'react-native-spinkit';
-import * as d3 from 'd3-shape';
+import * as shape from 'd3-shape';
 import AnimateStack from './AnimateStack';
 
-// const d3 = { shape };
+const d3 = { shape };
 const { Group, Shape, Surface } = ART;
 
 const styles = StyleSheet.create({
@@ -109,19 +109,19 @@ class PrimaryWrapper extends Component {
     console.log('state interperetedData', this.state.interperetedData);
   }
   createD3Stack() {
-    const stack = d3
+    const stack = d3.shape
       .stack()
       .keys(this.state.keys)
-      .order(d3.stackOrderNone)
-      .offset(d3.stackOffsetNone);
+      .order(d3.shape.stackOrderNone)
+      .offset(d3.shape.stackOffsetNone);
 
     const series = stack(this.state.interperetedData);
     console.log('series', series);
-    console.log('woof', d3.area);
+    console.log('woof', d3.shape.area);
     // const x = d => d[0];
     // const y = d => d[1];
 
-    const area = d3
+    const area = d3.shape
       .area()
       .x(({ data }) => data.time)
       .y0(([y0, y1]) => {
