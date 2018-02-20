@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { ART, StyleSheet, Text, View, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 // import Spinner from 'react-native-spinkit';
-import * as shape from 'd3-shape';
+import * as d3 from 'd3';
 import AnimateStack from './AnimateStack';
 
-const d3 = { shape };
+// const d3 = { shape, scale };
 const { Group, Shape, Surface } = ART;
 
 const styles = StyleSheet.create({
@@ -24,18 +24,21 @@ class PrimaryWrapper extends Component {
       dimensions: { width: undefined, height: undefined },
       interperetedData: undefined,
       keys: undefined,
+      series: undefined,
+      width: 400,
+      height: 400,
     };
     this.onLayout = this.onLayout.bind(this);
     this.interperetData = this.interperetData.bind(this);
     this.createD3Data = this.createD3Data.bind(this);
+    this.scaleX = this.scaleX.bind(this);
+    this.scaleY = this.scaleY.bind(this);
+    this.stackArea = this.stackArea.bind(this);
   }
   componentDidMount() {
     const { coin } = this.props;
     setInterval(() => {
-      const { data } = this.props.transactionData[coin];
-      if (data.length !== 0) {
-        this.createD3Data(coin, 3000);
-      }
+      this.createD3Data(coin, 3000);
     }, 3000);
   }
   onLayout(event) {
@@ -109,34 +112,57 @@ class PrimaryWrapper extends Component {
     console.log('state interperetedData', this.state.interperetedData);
   }
   createD3Stack() {
-    const stack = d3.shape
+    const stack = d3
       .stack()
       .keys(this.state.keys)
-      .order(d3.shape.stackOrderNone)
-      .offset(d3.shape.stackOffsetNone);
+      .order(d3.stackOrderNone)
+      .offset(d3.stackOffsetNone);
 
     const series = stack(this.state.interperetedData);
+    this.setState({ series });
     console.log('series', series);
-    console.log('woof', d3.shape.area);
-    // const x = d => d[0];
-    // const y = d => d[1];
-
-    const area = d3.shape
-      .area()
-      .x(({ data }) => data.time)
-      .y0(([y0, y1]) => {
-        console.log('hello', y0);
-        return y0;
-      })
-      .y1(([y0, y1]) => y1);
-    console.log('area', area);
-    series.map((datum, i) => console.log(`series map ${i}`, area(datum)));
+  }
+  colors() {
+    this.result = d3.scaleOrdinal(d3.schemeCategory10);
+    return this.result;
   }
 
+  scaleY() {
+    const { series } = this.state;
+    this.result = d3
+      .scaleLinear()
+      .domain([
+        d3.min(series[0].map(([y0, y1]) => y0)),
+        d3.max(series[series.length - 1].map(([y0, y1]) => y1)),
+      ])
+      .range([0, this.state.height]);
+    console.log('scaleY', this.result);
+    return this.result;
+  }
+  scaleX() {
+    this.result = d3
+      .scaleLinear()
+      .domain(d3.extent(this.state.interperetedData.map(v => v.time)))
+      .range([0, this.state.width]);
+    console.log('scaleX', this.result);
+
+    return this.result;
+  }
+  stackArea(data) {
+    console.log('stackin blocks');
+    const area = d3
+      .area()
+      .x(({ data }) => this.scaleX(data.time))
+      .y0(([y0, y1]) => this.scaleY(y0))
+      .y1(([y0, y1]) => y1);
+    console.log('area', area);
+    area(data);
+  }
   render() {
     console.log('rendering');
     const { width, height } = this.state.dimensions;
     const { coin, interperetedData } = this.props;
+
     if (
       this.props.transactionData[coin].data.length === undefined ||
       this.props.transactionData[coin].data.length === 0
@@ -148,7 +174,7 @@ class PrimaryWrapper extends Component {
         </View>
       );
     }
-
+    console.log('this.state.series', this.state.series);
     return (
       <View style={styles.container} onLayout={this.onLayout}>
         <Text>This is the Primary Data Wrapper</Text>
@@ -165,8 +191,18 @@ class PrimaryWrapper extends Component {
                 />
                 ))
               : null} */}
-
-            <Shape />
+            {this.state.series
+              ? this.state.series.map((datum, i) =>
+                    (this.stackArea(datum) ? (
+                      <Shape
+                        d={this.stackArea(datum)}
+                        fill={this.colors[8 + i]}
+                        key={this.state.keys[i]}
+                        stroke="black"
+                        strokeWidth={4}
+                      />
+                    ) : null))
+              : null}
           </Group>
         </Surface>
       </View>
