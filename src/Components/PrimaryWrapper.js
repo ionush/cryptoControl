@@ -2,10 +2,13 @@ import React, { Component } from 'react';
 import { ART, StyleSheet, Text, View, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 // import Spinner from 'react-native-spinkit';
-import * as d3 from 'd3';
+import * as d3shape from 'd3-shape';
+import * as d3scale from 'd3-scale';
+import * as d3array from 'd3-array';
+import * as d3scalechromatic from 'd3-scale-chromatic';
 import AnimateStack from './AnimateStack';
 
-// const d3 = { shape, scale };
+// const d3 = { shape, scale, array };
 const { Group, Shape, Surface } = ART;
 
 const styles = StyleSheet.create({
@@ -26,7 +29,7 @@ class PrimaryWrapper extends Component {
       keys: undefined,
       series: undefined,
       width: 400,
-      height: 400,
+      height: 250,
     };
     this.onLayout = this.onLayout.bind(this);
     this.interperetData = this.interperetData.bind(this);
@@ -38,7 +41,10 @@ class PrimaryWrapper extends Component {
   componentDidMount() {
     const { coin } = this.props;
     setInterval(() => {
-      this.createD3Data(coin, 3000);
+      const { data } = this.props.transactionData[coin];
+      if (data.length !== 0) {
+        this.createD3Data(coin, 3000);
+      }
     }, 3000);
   }
   onLayout(event) {
@@ -75,6 +81,7 @@ class PrimaryWrapper extends Component {
       '>1.5': 0,
     };
     this.setState({ keys: Object.keys(this.interpereted) });
+
     if (data.length === undefined || data.length === 0) {
       this.interpereted.time = new Date();
     }
@@ -104,6 +111,11 @@ class PrimaryWrapper extends Component {
     const { interperetedData } = this.state;
     const d3Data = this.interperetData(this.getLatestData(coin, time));
     if (this.state.interperetedData) {
+      if (this.state.interperetedData.length > 50) {
+        const shortInterperetedData = interperetedData.slice(0, 50);
+        this.setState({ interperetedData: [d3Data, ...shortInterperetedData] }, () =>
+          this.createD3Stack());
+      }
       this.setState({ interperetedData: [d3Data, ...interperetedData] }, () =>
         this.createD3Stack());
     } else {
@@ -112,51 +124,60 @@ class PrimaryWrapper extends Component {
     console.log('state interperetedData', this.state.interperetedData);
   }
   createD3Stack() {
-    const stack = d3
+    const stack = d3shape
       .stack()
       .keys(this.state.keys)
-      .order(d3.stackOrderNone)
-      .offset(d3.stackOffsetNone);
+      .order(d3shape.stackOrderNone)
+      .offset(d3shape.stackOffsetSilhouette);
 
     const series = stack(this.state.interperetedData);
     this.setState({ series });
     console.log('series', series);
   }
   colors() {
-    this.result = d3.scaleOrdinal(d3.schemeCategory10);
+    this.result = d3scale.scaleOrdinal(d3scalechromatic.schemeCategory10);
+    console.log('colors', this.result);
     return this.result;
   }
 
-  scaleY() {
+  scaleY(data) {
     const { series } = this.state;
-    this.result = d3
+    // const getAllY = series.reduce((acc, element) => {
+    //   const slice = element.slice(0, element.length - 1);
+    //   acc.push(slice.reduce((accc, elementt) => {
+    //     accc.push(elementt[0], elementt[1]);
+    //     return accc;
+    //   }, []));
+    //   return acc;
+    // }, []);
+    // const flatten = list => list.reduce((a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []);
+    // const result = flatten(getAllY);
+    // console.log('fucking please', result);
+
+    this.result = d3scale
       .scaleLinear()
       .domain([
-        d3.min(series[0].map(([y0, y1]) => y0)),
-        d3.max(series[series.length - 1].map(([y0, y1]) => y1)),
+        d3array.min(series[0].map(([y0, y1]) => y0)),
+        d3array.max(series[series.length - 1].map(([y0, y1]) => y1)),
+        // d3array.max(result),
       ])
       .range([0, this.state.height]);
-    console.log('scaleY', this.result);
-    return this.result;
+    return this.result(data);
   }
-  scaleX() {
-    this.result = d3
+  scaleX(data) {
+    this.result = d3scale
       .scaleLinear()
-      .domain(d3.extent(this.state.interperetedData.map(v => v.time)))
+      .domain(d3array.extent(this.state.interperetedData.map(v => v.time)))
       .range([0, this.state.width]);
-    console.log('scaleX', this.result);
-
-    return this.result;
+    return this.result(data);
   }
   stackArea(data) {
-    console.log('stackin blocks');
-    const area = d3
+    this.area = d3shape
       .area()
       .x(({ data }) => this.scaleX(data.time))
       .y0(([y0, y1]) => this.scaleY(y0))
       .y1(([y0, y1]) => y1);
-    console.log('area', area);
-    area(data);
+    return this.area(data);
   }
   render() {
     console.log('rendering');
@@ -165,7 +186,8 @@ class PrimaryWrapper extends Component {
 
     if (
       this.props.transactionData[coin].data.length === undefined ||
-      this.props.transactionData[coin].data.length === 0
+      this.props.transactionData[coin].data.length === 0 ||
+      this.state.series === undefined
     ) {
       return (
         <View style={styles.container}>
@@ -175,31 +197,21 @@ class PrimaryWrapper extends Component {
       );
     }
     console.log('this.state.series', this.state.series);
+
     return (
       <View style={styles.container} onLayout={this.onLayout}>
         <Text>This is the Primary Data Wrapper</Text>
-        <Surface width={400} height={300}>
-          <Group x={200} y={150}>
-            {/* {interperetedData
-              ? interperetedData.map((datum, i) => (
-                <AnimateStack
-                  stroke="white"
-                  strokeWidth={4}
-                  fill={this.getColor(i)}
-                  key={`key${datum.name}`}
-                  d={() => this.createPath(data, i)}
-                />
-                ))
-              : null} */}
+        <Surface width={400} height={250}>
+          <Group x={10} y={10}>
             {this.state.series
               ? this.state.series.map((datum, i) =>
                     (this.stackArea(datum) ? (
                       <Shape
                         d={this.stackArea(datum)}
-                        fill={this.colors[8 + i]}
+                        // fill={d3scalechromatic.schemeCategory10[i]}
                         key={this.state.keys[i]}
                         stroke="black"
-                        strokeWidth={4}
+                        strokeWidth={1}
                       />
                     ) : null))
               : null}
