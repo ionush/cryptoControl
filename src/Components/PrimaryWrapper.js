@@ -142,24 +142,12 @@ class PrimaryWrapper extends Component {
 
   scaleY(data) {
     const { series } = this.state;
-    // const getAllY = series.reduce((acc, element) => {
-    //   const slice = element.slice(0, element.length - 1);
-    //   acc.push(slice.reduce((accc, elementt) => {
-    //     accc.push(elementt[0], elementt[1]);
-    //     return accc;
-    //   }, []));
-    //   return acc;
-    // }, []);
-    // const flatten = list => list.reduce((a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []);
-    // const result = flatten(getAllY);
-    // console.log('fucking please', result);
 
     this.result = d3scale
       .scaleLinear()
       .domain([
         d3array.min(series[0].map(([y0, y1]) => y0)),
         d3array.max(series[series.length - 1].map(([y0, y1]) => y1)),
-        // d3array.max(result),
       ])
       .range([0, this.state.height]);
     return this.result(data);
