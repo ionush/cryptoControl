@@ -22,7 +22,7 @@ const Tab = props => (
   <TabView
     style={styles.tab}
     tabBarPosition="overlayTop"
-    tabBarBackgroundColor="#4ABDAC"
+    tabBarBackgroundColor="#ad5389"
     tabBarActiveTextColor="white"
     tabBarInactiveTextColor="white"
     tabBarUnderlineStyle={styles.underlineStyle}

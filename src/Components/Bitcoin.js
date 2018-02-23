@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
 
 const Bitcoin = () => (
   <View style={styles.container}>
-    <PrimaryWrapper coin="BTC" />
+    <PrimaryWrapper speed={3000} coin="BTC" />
     <SecondaryWrapper coin="BTC" />
   </View>
 );

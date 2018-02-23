@@ -1,5 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import PrimaryWrapper from './PrimaryWrapper';
+import SecondaryWrapper from './SecondaryWrapper';
 
 const styles = StyleSheet.create({
   container: {
@@ -12,7 +14,8 @@ const styles = StyleSheet.create({
 
 const Ethereum = () => (
   <View style={styles.container}>
-    <Text>This is the Ethereum page</Text>
+    <PrimaryWrapper speed={3000} coin="ETH" />
+    <SecondaryWrapper coin="ETH" />
   </View>
 );
 

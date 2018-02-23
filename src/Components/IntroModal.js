@@ -4,7 +4,7 @@ import { Modal, StyleSheet, Text, View } from 'react-native';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#4ABDAC',
+    backgroundColor: '#ad5389',
     alignItems: 'center',
     justifyContent: 'center',
   },

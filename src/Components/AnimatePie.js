@@ -4,7 +4,6 @@ import Morph from 'art/morph/path';
 import * as shape from 'd3-shape';
 
 const { Shape } = ART;
-const AnimationDurationMs = 5000;
 
 export default class AnimatePie extends Component {
   constructor(props) {
@@ -44,9 +43,7 @@ export default class AnimatePie extends Component {
     // Only animate if our properties change. Typically this is when our
     // yAccessor function changes.
     if (this.previousPie !== pie) {
-      console.log('pies are different');
       const pathFrom = this.previousPie;
-      console.log('pathf rom ');
       const pathTo = pie;
 
       cancelAnimationFrame(this.animating);
@@ -57,7 +54,7 @@ export default class AnimatePie extends Component {
       // we could use the Animated component from React Native, however this
       // was a nice shortcut to get the same effect.
       LayoutAnimation.configureNext(LayoutAnimation.create(
-        AnimationDurationMs,
+        this.props.animationMs,
         LayoutAnimation.Types.easeInEaseOut,
         LayoutAnimation.Properties.opacity,
       ));
@@ -84,7 +81,7 @@ export default class AnimatePie extends Component {
       }
 
       // Get the delta on how far long in our animation we are.
-      const delta = (timestamp - start) / AnimationDurationMs;
+      const delta = (timestamp - start) / this.props.animationMs;
 
       // If we're above 1 then our animation should be complete.
       if (delta > 1) {
@@ -98,9 +95,8 @@ export default class AnimatePie extends Component {
 
       try {
         this.state.path.tween(delta);
-        console.log('this.state.path.tween(delta) was called!');
       } catch (e) {
-        console.log('e', e);
+        console.log('error in tween(delta)', e);
       }
 
       this.setState(this.state, () => {
