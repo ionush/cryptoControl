@@ -1,6 +1,6 @@
 # CryptoControl #
 
-## A cryptocurrency data vizualisation smartphone app ##
+## A cryptocurrency data vizualisation smartphone app built in react native##
 
 ## proof of concept ##
 
