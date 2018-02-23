@@ -31,7 +31,6 @@ class Main extends React.Component {
   }
 
   render() {
-    console.log('rendering');
     const { introScreen } = this.state;
     setTimeout(() => {
       this.setState({ introScreen: false });

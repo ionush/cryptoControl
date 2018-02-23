@@ -46,7 +46,8 @@ class SecondaryWrapper extends Component {
   }
 
   getColor(index) {
-    this.colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#D3D3D3'];
+    this.colors = ['#3C1053', '#4E1B5C', '#612665', '#74316e', '#873c77', '#9a4780', '#ad5389'];
+
     return this.colors[index];
   }
   createPath(dataset, index) {
@@ -56,7 +57,7 @@ class SecondaryWrapper extends Component {
     return d3.shape
       .arc()
       .outerRadius(outerVal)
-      .innerRadius(40)(this.singleArc);
+      .innerRadius(60)(this.singleArc);
   }
   // create a function that groups transactions into different sizes
   interperetData(data) {
@@ -117,6 +118,7 @@ class SecondaryWrapper extends Component {
 
       return (
         <View style={styles.container} onLayout={this.onLayout}>
+          <Text>Deeper Colour == Larger Transaction</Text>
           <Text>LAST 100 TRADES</Text>
           <Surface width={400} height={300}>
             <Group x={200} y={150}>
@@ -126,6 +128,7 @@ class SecondaryWrapper extends Component {
                   // onPress={this.state.pressed !== i ? this.setState({ pressed: { i } }) : null}
                 >
                   <AnimatePie
+                    animationMs={5000}
                     stroke="white"
                     strokeWidth={4}
                     fill={this.getColor(i)}
