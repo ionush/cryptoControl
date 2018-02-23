@@ -1,5 +1,3 @@
-import moment from 'moment';
-
 export const promisePending = (state, action) => {
   const { coin } = action.meta;
   return {

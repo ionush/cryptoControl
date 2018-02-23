@@ -11,10 +11,11 @@ const { Group, Shape, Surface } = ART;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1.2,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 20,
   },
 });
 
