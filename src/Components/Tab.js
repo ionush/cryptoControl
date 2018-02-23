@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   tab: {
-    marginTop: 24,
+    marginTop: 0,
     height: 0,
   },
   tabLabel: {

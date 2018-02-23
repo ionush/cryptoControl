@@ -17,7 +17,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 40,
   },
+  marginTop: {},
 });
 
 class PrimaryWrapper extends Component {
@@ -111,8 +113,8 @@ class PrimaryWrapper extends Component {
     const { interperetedData } = this.state;
     const d3Data = this.interperetData(this.getLatestData(coin, time));
     if (interperetedData) {
-      if (interperetedData.length > 40) {
-        const shortInterperetedData = interperetedData.slice(0, 40);
+      if (interperetedData.length > 25) {
+        const shortInterperetedData = interperetedData.slice(0, 25);
         this.setState({ interperetedData: [d3Data, ...shortInterperetedData] }, () =>
           this.createD3Stack());
       } else {
@@ -158,7 +160,8 @@ class PrimaryWrapper extends Component {
         d3array.min(series[0].map(([y0, y1]) => y0)),
         d3array.max(series[series.length - 1].map(([y0, y1]) => y1)),
       ])
-      .range([this.state.dimensions.height - 150, 0]);
+
+      .range([this.state.dimensions.height - 100, 0]);
     return this.result(data);
   }
   scaleX(data) {
@@ -197,9 +200,11 @@ class PrimaryWrapper extends Component {
 
     return (
       <View style={styles.container} onLayout={this.onLayout}>
-        <Text>LIVE TRANSACTION STREAM</Text>
-        <Text>Updated Every {this.props.speed / 1000} Seconds</Text>
-        <Surface width={400} height={250}>
+        <View>
+          <Text style={styles.marginTop}>LIVE TRANSACTION STREAM</Text>
+          <Text>Updated Every {this.props.speed / 1000} Seconds</Text>
+        </View>
+        <Surface width={400} height={200}>
           <Group x={0} y={50}>
             {series
               ? series.map((datum, i) =>
