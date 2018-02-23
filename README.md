@@ -20,10 +20,14 @@ The lower graph animates between values using the *Morph.Tween* method of ART
 
 #### nb- only tested on android ####
 
-To run you must have react-native installed.
+To run on pc you must have react-native and android-studio installed. More info on react native page https://facebook.github.io/react-native/docs/getting-started.html
+
 In terminal
 - npm i
 - react-native run-android
+
+On your Smartphone
+- download app-release.apk in the root directory to run on your phone!
 
 ### Comments ###
 
